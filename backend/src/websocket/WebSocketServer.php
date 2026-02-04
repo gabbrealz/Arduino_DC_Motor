@@ -10,8 +10,6 @@ class WebSocketServer implements MessageComponentInterface {
     protected ?ConnectionInterface $arduino = null;
     protected array $clients = [];
     private Browser $browser;
-    private int $last_log = 0;
-    private bool $last_state = false;
 
     public function __construct(LoopInterface $loop) {
         $this->browser = new Browser($loop);
@@ -25,23 +23,34 @@ class WebSocketServer implements MessageComponentInterface {
     public function onMessage(ConnectionInterface $from, MessageInterface $data) {
         $decoded = json_decode($data, true) ?? [];
 
-        if (($decoded['role'] ?? '') === 'arduino') {
-            $this->arduino = $from;
-            unset($this->clients[$from->resourceId]);
-            echo "New arduino client: {$from->resourceId}\n";
+        if (isset($decoded['r'])) {
+            if ($decoded['r'] === 'arduino') {
+                $this->arduino = $from;
+                unset($this->clients[$from->resourceId]);
+                echo "New arduino client: {$from->resourceId}\n";
+            }
             return;
         }
 
-        // TODO: handle the sent data
+        $postlogs_payload = [];
 
-        if (time() - $this->last_log < 10) return;
+        if ($from === $this->arduino) {
+            foreach ($this->clients as $client) $client->send($data);
 
-        $this->last_log = time();
+            $postlogs_payload['component'] = $decoded['c'];
+            $postlogs_payload['description'] = (string) $decoded['d'];
+        }
+        else {
+            if ($this->arduino !== null) $this->arduino->send($data);
+
+            $postlogs_payload['component'] = $decoded['c'];
+            $postlogs_payload['description'] = (string) $decoded['d'];
+        }
 
         $this->browser->post(
             'http://127.0.0.1/arduino-dcmotor-backend/post-logs.php',
             ['Content-Type' => 'application/json'],
-            ""
+            json_encode($postlogs_payload)
         )->then(
             function ($response) { echo "Data was logged!\n"; },
             function ($error) { echo "\nFailed to log: {$error->getMessage()}\n\n"; }
