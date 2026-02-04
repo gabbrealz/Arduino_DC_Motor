@@ -12,7 +12,7 @@ $lock_handle = fopen($init_db_lock, 'c+');
 
 $db_host = $_ENV['MARIADB_HOST'];
 $db_port = $_ENV['MARIADB_PORT'];
-$db_name = $_ENV['MARIADB_NAME'];
+$db_name = $_ENV['MARIADB_DATABASE'];
 $db_user = $_ENV['MARIADB_USER'];
 $db_pass = $_ENV['MARIADB_PASSWORD'];
 $db_root_pass = $_ENV['MARIADB_ROOT_PASSWORD'];

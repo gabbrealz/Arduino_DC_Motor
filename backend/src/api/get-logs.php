@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 require __DIR__ . '/../config/bootstrap.php';
 
 try {
-    $stmt = $pdo->query('SELECT log_time, sensor, description FROM SensorLog ORDER BY id DESC LIMIT 100');
+    $stmt = $pdo->query('SELECT log_time, component, description FROM ComponentLog ORDER BY id DESC LIMIT 100');
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($rows);
 }
