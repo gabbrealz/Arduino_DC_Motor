@@ -1,9 +1,42 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Lightbulb, Power, Sun } from 'lucide-react';
+import { DeviceContext } from '../Contexts.jsx';
 
 export default function LightCard({ name = "Room", accentColor = "#fde047" }) {
-  const [on, setOn] = useState(false);
-  const [brightness, setBrightness] = useState(0);
+  const { devices, send, systemStatus } = useContext(DeviceContext);
+  const lightContext = devices[name.toLowerCase()] || { on: false, brightness: 0 };
+  const componentName = name.toUpperCase();
+
+  const [on, setOn] = useState(lightContext.on);
+  const [brightness, setBrightness] = useState(lightContext.brightness || 50);
+
+  useEffect(() => {
+    setOn(lightContext.on);
+    setBrightness(lightContext.brightness || 50);
+  }, [lightContext.on, lightContext.brightness]);
+
+  const toggleLight = () => {
+    if (systemStatus !== 'online') return;
+
+    const newValue = on ? 0 : (brightness || 50);
+    setOn(!on);
+    setBrightness(newValue);
+
+    send({
+      component: componentName,
+      value: newValue,
+    });
+  };
+
+  const changeBrightness = (value) => {
+    if (systemStatus !== 'online') return;
+
+    setBrightness(value);
+    send({
+      component: componentName,
+      value: value,
+    });
+  };
 
   const alphaHex = on ? Math.floor((brightness / 100) * 255).toString(16).padStart(2, '0') : "00";
   const spread = on ? (brightness / 1.5) : 0;
@@ -28,10 +61,12 @@ export default function LightCard({ name = "Room", accentColor = "#fde047" }) {
           </div>
           
           <button
-            onClick={() => setOn(!on)}
+            onClick={toggleLight}
+            disabled={systemStatus !== 'online'}
             style={{ 
               backgroundColor: on ? accentColor : '#262626',
-              color: on ? 'black' : '#737373'
+              color: on ? 'black' : '#737373',
+              cursor: systemStatus !== 'online' ? 'not-allowed' : 'pointer'
             }}
             className="p-3 rounded-full transition-all duration-500 active:scale-95 shadow-lg"
           >
@@ -55,10 +90,10 @@ export default function LightCard({ name = "Room", accentColor = "#fde047" }) {
             min="0"
             max="100"
             value={brightness}
-            onChange={(e) => setBrightness(Number(e.target.value))}
-            disabled={!on}
-            style={{ accentColor: on ? accentColor : '#525252' }}
-            className="w-full h-2 bg-neutral-800 rounded-full appearance-none cursor-pointer"
+            onChange={(e) => changeBrightness(Number(e.target.value))}
+            disabled={!on || systemStatus !== 'online'}
+            style={{ accentColor: on ? accentColor : '#525252', cursor: systemStatus !== 'online' ? 'not-allowed' : 'pointer' }}
+            className="w-full h-2 bg-neutral-800 rounded-full appearance-none"
           />
         </div>
 
