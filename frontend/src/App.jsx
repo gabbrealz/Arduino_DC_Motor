@@ -10,9 +10,9 @@ export default function App() {
     { id: 1, name: "Red", type: "light", color: "#F40000" }, 
     { id: 2, name: "Yellow", type: "light", color: "#FEEF4C" },    
     { id: 3, name: "Green", type: "light", color: "#72BF00" }, 
-    { id: 4, name: "Fan", type: "fan", color: "#00A3F5" },      
+    { id: 4, name: "Fan", type: "fan", color: "#FF6EB6" },      
     { id: 5, name: "Orange", type: "light", color: "#FF6308" }, 
-    { id: 6, name: "Violet", type: "light", color: "#A327F0" }, 
+    { id: 6, name: "Blue", type: "light", color: "#00A3F5" }, 
   ];
 
   const filteredDevices = devices.filter(
