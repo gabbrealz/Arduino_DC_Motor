@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Fan, Power, Activity } from 'lucide-react';
 
-export default function FanCard() {
+export default function FanCard({ name = "Fan", accentColor = "#06b6d4" }) {
   const [on, setOn] = useState(false);
   const [speed, setSpeed] = useState(40);
 
@@ -11,24 +11,36 @@ export default function FanCard() {
   const offset = circumference - (speed / 100) * circumference;
 
   return (
-    <div className="font-sans">
+    <div className="font-sans shrink-0">
       <div className="bg-[#1a1a1a] text-white rounded-[2.5rem] p-8 w-80 h-[420px] flex flex-col justify-between shadow-2xl border border-white/5">
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-full border-2 transition-all duration-500 ${
-              on ? 'border-cyan-500 text-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'border-neutral-700 text-neutral-600'
-            }`}>
-              <Fan size={24} strokeWidth={2.5} className={on ? "animate-spin" : ""} style={{ animationDuration: rotationDuration }} />
+            <div 
+              style={{ 
+                borderColor: on ? accentColor : '#3f3f46', 
+                color: on ? accentColor : '#525252',
+                boxShadow: on ? `0 0 15px ${accentColor}44` : 'none' 
+              }}
+              className="p-3 rounded-full border-2 transition-all duration-500"
+            >
+              <Fan 
+                size={24} 
+                strokeWidth={2.5} 
+                className={on ? "animate-spin" : ""} 
+                style={{ animationDuration: rotationDuration }} 
+              />
             </div>
-            <span className="text-xl font-bold tracking-tight">Ceiling Fan</span>
+            <span className="text-xl font-bold tracking-tight">{name}</span>
           </div>
           
           <button
             onClick={() => setOn(!on)}
-            className={`p-3 rounded-full transition-all duration-500 active:scale-95 ${
-              on ? "bg-cyan-500 text-black scale-110 shadow-lg" : "bg-neutral-800 text-neutral-500"
-            }`}
+            style={{ 
+              backgroundColor: on ? accentColor : '#262626',
+              color: on ? 'black' : '#737373'
+            }}
+            className="p-3 rounded-full transition-all duration-500 active:scale-95 shadow-lg"
           >
             <Power size={20} />
           </button>
@@ -40,7 +52,9 @@ export default function FanCard() {
               <Activity size={18} />
               <span className="text-[10px] uppercase tracking-[0.2em] font-black">Velocity</span>
             </div>
-            <span className="text-lg font-bold tabular-nums text-cyan-400">{speed}%</span>
+            <span style={{ color: on ? accentColor : '#737373' }} className="text-lg font-bold tabular-nums">
+              {speed}%
+            </span>
           </div>
           
           <input
@@ -50,25 +64,28 @@ export default function FanCard() {
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
             disabled={!on}
-            className="w-full h-2 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-cyan-500"
+            style={{ accentColor: on ? accentColor : '#525252' }}
+            className="w-full h-2 bg-neutral-800 rounded-full appearance-none cursor-pointer"
           />
         </div>
 
         <div className="relative h-40 flex items-center justify-center pt-2">
           <div className="relative w-full h-full bg-black/20 rounded-[2rem] border border-white/5 flex items-center justify-center overflow-hidden">
             <svg className="absolute transform -rotate-90 w-32 h-32">
-              <circle cx="64" cy="64" r={radius} stroke="currentColor" strokeWidth="6" fill="transparent" className="text-neutral-800" />
+              <circle cx="64" cy="64" r={radius} stroke="#262626" strokeWidth="6" fill="transparent" />
               <circle
                 cx="64"
                 cy="64"
                 r={radius}
-                stroke="currentColor"
+                stroke={on ? accentColor : '#262626'}
                 strokeWidth="7"
                 strokeDasharray={circumference}
-                style={{ strokeDashoffset: on ? offset : circumference, transition: 'stroke-dashoffset 0.5s ease-out' }}
+                style={{ 
+                  strokeDashoffset: on ? offset : circumference, 
+                  transition: 'stroke-dashoffset 0.5s ease-out' 
+                }}
                 strokeLinecap="round"
                 fill="transparent"
-                className="text-cyan-500"
               />
             </svg>
             <div className="text-center z-10">
