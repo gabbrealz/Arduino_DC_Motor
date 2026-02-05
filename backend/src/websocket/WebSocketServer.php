@@ -21,6 +21,7 @@ class WebSocketServer implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, MessageInterface $data) {
+        echo "[{$from->resourceId}] $data\n";
         $decoded = json_decode($data, true) ?? [];
 
         if (isset($decoded['r'])) {
@@ -53,7 +54,8 @@ class WebSocketServer implements MessageComponentInterface {
             json_encode($postlogs_payload)
         )->then(
             function ($response) { echo "Data was logged!\n"; },
-            function ($error) { echo "\nFailed to log: {$error->getMessage()}\n\n"; }
+            // function ($error) { echo "\nFailed to log: {$error->getMessage()}\n\n"; }
+            function ($error) {}
         );
     }
 
