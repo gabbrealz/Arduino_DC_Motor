@@ -10,6 +10,8 @@ class WebSocketServer implements MessageComponentInterface {
     protected ?ConnectionInterface $arduino = null;
     protected array $clients = [];
     private Browser $browser;
+    private array $log_buffer = [];
+    private int $last_log = 0;
 
     public function __construct(LoopInterface $loop) {
         $this->browser = new Browser($loop);
@@ -24,8 +26,8 @@ class WebSocketServer implements MessageComponentInterface {
         echo "[{$from->resourceId}] $data\n";
         $decoded = json_decode($data, true) ?? [];
 
-        if (isset($decoded['r'])) {
-            if ($decoded['r'] === 'arduino') {
+        if (isset($decoded['role'])) {
+            if ($decoded['role'] === 'arduino') {
                 $this->arduino = $from;
                 unset($this->clients[$from->resourceId]);
                 echo "New arduino client: {$from->resourceId}\n";
@@ -33,29 +35,40 @@ class WebSocketServer implements MessageComponentInterface {
             return;
         }
 
-        $postlogs_payload = [];
+        $postlogs_payload = ['component' => $decoded['component']];
 
-        if ($from === $this->arduino) {
-            foreach ($this->clients as $client) $client->send($data);
-
-            $postlogs_payload['component'] = $decoded['c'];
-            $postlogs_payload['description'] = (string) $decoded['d'];
+        if ($decoded['component'] !== 'SWING') {
+            $decoded['value'] = round($decoded['value'] * 2.55);
+            if ($this->arduino !== null) $this->arduino->send(json_encode($decoded));
         }
-        else {
-            if ($this->arduino !== null) $this->arduino->send($data);
+        else if ($this->arduino !== null) $this->arduino->send($data);
 
-            $postlogs_payload['component'] = $decoded['c'];
-            $postlogs_payload['description'] = (string) $decoded['d'];
+        switch ($decoded['component']) {
+            case "SWING":
+                $postlogs_payload['description'] = $decoded['value'] === 1 ? "Fan swing ON" : "Fan swing OFF";
+                break;
+            case "FAN":
+                $postlogs_payload["description"] = $decoded["value"] === 0 ? "Turned OFF" : "Set speed: {$decoded['value']}";
+                break;
+            default:
+                $postlogs_payload["description"] = $decoded["value"] === 0 ? "Turned OFF" : "Set brightness: {$decoded['value']}";
+                break;
         }
+
+        $this->log_buffer[] = $postlogs_payload;
+
+        if (time() - $this->last_log < 0.75) return;
+
+        $this->last_log = time();
+        $postlogs_payload = array_shift($this->log_buffer);
 
         $this->browser->post(
-            'http://127.0.0.1/arduino-dcmotor-backend/post-logs.php',
+            'http://127.0.0.1/arduino-dcmotor/post-logs.php',
             ['Content-Type' => 'application/json'],
             json_encode($postlogs_payload)
         )->then(
             function ($response) { echo "Data was logged!\n"; },
-            // function ($error) { echo "\nFailed to log: {$error->getMessage()}\n\n"; }
-            function ($error) {}
+            function ($error) { echo "\nFailed to log: {$error->getMessage()}\n\n"; }
         );
     }
 
