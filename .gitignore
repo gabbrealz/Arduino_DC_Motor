@@ -3,6 +3,6 @@
 node_modules/
 dist/
 
-config/flags/
-config/locks/
+*.done
+*.locks
 vendor/
