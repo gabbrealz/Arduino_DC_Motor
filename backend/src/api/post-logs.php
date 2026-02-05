@@ -26,7 +26,7 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
 try {
     $pdo->beginTransaction();
 
-    $sensor_stmt = $pdo->prepare('INSERT INTO SensorLog (component, description) VALUES (:component, :description)');
+    $sensor_stmt = $pdo->prepare('INSERT INTO ComponentLog (component, description) VALUES (:component, :description)');
     $sensor_stmt->execute([
         'component' => $data['component'],
         'description' => $data['description']
