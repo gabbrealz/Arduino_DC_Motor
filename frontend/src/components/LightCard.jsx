@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Lightbulb, Power, Sun } from 'lucide-react';
 
 export default function LightCard({ name = "Room", accentColor = "#fde047" }) {
-  const [on, setOn] = useState(true);
-  const [brightness, setBrightness] = useState(90);
+  const [on, setOn] = useState(false);
+  const [brightness, setBrightness] = useState(0);
 
   const alphaHex = on ? Math.floor((brightness / 100) * 255).toString(16).padStart(2, '0') : "00";
   const spread = on ? (brightness / 1.5) : 0;

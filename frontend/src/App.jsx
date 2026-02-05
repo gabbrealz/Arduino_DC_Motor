@@ -7,12 +7,12 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('all');
 
   const devices = [
-    { id: 1, name: "Living Room", type: "light", color: "#F40000" }, 
-    { id: 2, name: "Kitchen", type: "light", color: "#FEEF4C" },    
-    { id: 3, name: "Gaming Room", type: "light", color: "#72BF00" }, 
-    { id: 4, name: "Main Fan", type: "fan", color: "#00A3F5" },      
-    { id: 5, name: "Gaming Room", type: "light", color: "#72BF00" }, 
-    { id: 5, name: "Gaming Room", type: "light", color: "#72BF00" }, 
+    { id: 1, name: "Red", type: "light", color: "#F40000" }, 
+    { id: 2, name: "Yellow", type: "light", color: "#FEEF4C" },    
+    { id: 3, name: "Green", type: "light", color: "#72BF00" }, 
+    { id: 4, name: "Fan", type: "fan", color: "#00A3F5" },      
+    { id: 5, name: "Orange", type: "light", color: "#FF6308" }, 
+    { id: 6, name: "Violet", type: "light", color: "#A327F0" }, 
   ];
 
   const filteredDevices = devices.filter(

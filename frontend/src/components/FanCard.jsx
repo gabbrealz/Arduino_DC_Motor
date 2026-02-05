@@ -3,7 +3,7 @@ import { Fan, Power, Activity } from 'lucide-react';
 
 export default function FanCard({ name = "Fan", accentColor = "#06b6d4" }) {
   const [on, setOn] = useState(false);
-  const [speed, setSpeed] = useState(40);
+  const [speed, setSpeed] = useState(0);
 
   const rotationDuration = on ? `${(100 - speed) / 40 + 0.2}s` : '0s';
   const radius = 45;
